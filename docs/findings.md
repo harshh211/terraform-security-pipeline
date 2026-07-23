@@ -50,3 +50,16 @@ Checkov secrets framework run standalone: 0 findings. The hardcoded RDS
 password in compute.tf was NOT detected — Checkov's console masking of
 password-shaped fields is cosmetic, not a rule match. This is the gap
 gitleaks is added to close in Week 2.
+
+## tfsec scan
+
+27 findings: 4 critical, 13 high, 6 medium, 4 low, 8 passed.
+Heavy overlap with Checkov (same static analysis, same misconfigurations) —
+expected, not a bug in either tool.
+
+Notable disagreement: tfsec flags the S3 bucket as unencrypted (HIGH,
+aws-s3-enable-bucket-encryption). Checkov's CKV_AWS_19 for the same bucket
+PASSED. Checkov accepts AWS's default server-side encryption as sufficient;
+tfsec requires an explicit encryption configuration resource. Same
+infrastructure, opposite verdict — the tools encode different definitions
+of "encrypted," not a detection gap in either one.
