@@ -63,3 +63,14 @@ PASSED. Checkov accepts AWS's default server-side encryption as sufficient;
 tfsec requires an explicit encryption configuration resource. Same
 infrastructure, opposite verdict — the tools encode different definitions
 of "encrypted," not a detection gap in either one.
+
+## Trivy config scan
+
+22 misconfigurations: compute.tf 8, network.tf 7, s3.tf 7.
+Overlaps Checkov and tfsec on all major issues (IMDSv1, public RDS, open
+SSH/RDP/egress, S3 public-access-block, missing versioning/logging).
+
+Encryption disagreement: Trivy's AWS-0132 flags the S3 bucket for lacking a
+customer-managed key — agreeing with tfsec, not Checkov's CKV_AWS_19 pass.
+2-of-3 tools want an explicit CMK; this is a judgment-call baseline
+difference, not a detection bug.
