@@ -5,3 +5,9 @@
 *.tfvars
 crash.log
 .DS_Store
+*.txt
+__pycache__/
+*.pyc
+*.txt
+__pycache__/
+*.pyc

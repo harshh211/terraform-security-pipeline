@@ -92,3 +92,30 @@ human-chosen passwords embedded in IaC. This is the motivating case for
 the custom Checkov policy planned in Week 3 — flag any literal value
 assigned to a sensitive-sounding attribute name (password, secret, token),
 independent of what the value looks like.
+
+## Custom policy: CKV_CUSTOM_1
+
+Motivated directly by the three-tool secrets-scan miss documented above.
+Checkov's secrets engine, Trivy's secret scanner, and gitleaks all failed
+to catch a hardcoded RDS password because their detection is pattern- or
+entropy-based, and a human-chosen password like "SuperSecret123!" doesn't
+match either signature.
+
+CKV_CUSTOM_1 takes a different approach: it flags any literal value on an
+attribute whose *name* looks sensitive (password, secret, token, api_key,
+access_key), independent of what the value looks like. Detection by
+attribute name instead of value shape closes exactly the gap the other
+three tools shared.
+
+Debugging note: an early version produced a false positive on the real
+RDS password (var.db_password), because Checkov's internal graph-renderer
+strips the ${ } wrapper from attributes that are entirely one
+interpolation — so the check received the bare string "var.db_password",
+not "${var.db_password}". Confirmed via a debug print against Checkov's
+actual runtime conf, then fixed by broadening the reference-detection
+pattern to match bare dotted references (var.x, local.x, data.x.y) in
+addition to the ${...} form.
+
+Verified with a true-positive/true-negative pair: a fixture with a
+hardcoded literal password fails; the real terraform/ directory, where
+the RDS password is a variable reference, passes cleanly.
