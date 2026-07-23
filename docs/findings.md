@@ -74,3 +74,21 @@ Encryption disagreement: Trivy's AWS-0132 flags the S3 bucket for lacking a
 customer-managed key — agreeing with tfsec, not Checkov's CKV_AWS_19 pass.
 2-of-3 tools want an explicit CMK; this is a judgment-call baseline
 difference, not a detection bug.
+
+## Secrets scan — cross-tool comparison
+
+Three dedicated secret-scanning paths, one hardcoded RDS password
+(compute.tf), zero detections:
+
+| Tool | Result | Reason |
+|---|---|---|
+| Checkov (secrets framework) | Scanned, 0 findings | Ran its detection rules against the file; no pattern matched a plain dictionary-style password |
+| Trivy (secret scanner) | Scanned, 0 findings | Log shows 0 "language-specific files" — .tf does not appear to be treated as a scannable type by default |
+| gitleaks | Scanned (~24.7 KB), 0 findings | Default rules target shaped secrets (API key prefixes, high-entropy strings); a readable password like "SuperSecret123!" doesn't match either pattern |
+
+Takeaway: pattern- and entropy-based secret scanning reliably catches
+machine-generated credentials (API keys, tokens) but is weak against
+human-chosen passwords embedded in IaC. This is the motivating case for
+the custom Checkov policy planned in Week 3 — flag any literal value
+assigned to a sensitive-sounding attribute name (password, secret, token),
+independent of what the value looks like.
