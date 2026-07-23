@@ -26,3 +26,27 @@ Running total: 31 failed, 23 passed
 Note: ci_policy passes every wildcard-action check (no literal `*`) but still
 fails the escalation check. Checkov flags escalation-capable permissions; it
 does not trace where the path leads or how many hops it takes.
+
+## EC2 + RDS scan
+
+Running total: 45 failed, 30 passed
+
+| Check | Resource | Issue | Severity | Verdict |
+|---|---|---|---|---|
+| CKV_AWS_79 | app_server | IMDSv1 enabled | Critical | Fix — SSRF-to-credential-theft path |
+| CKV_AWS_88 | app_server | Public IP assigned | High | Fix |
+| CKV_AWS_8 | app_server | Root volume unencrypted | Medium | Fix |
+| CKV2_AWS_41 | app_server | No IAM role attached | Low | Fix |
+| CKV_AWS_17 | app_db | Publicly accessible | Critical | Fix |
+| CKV_AWS_16 | app_db | Storage unencrypted | High | Fix |
+| CKV_AWS_293 | app_db | No deletion protection | Medium | Fix |
+| CKV_AWS_161 | app_db | No IAM authentication | Medium | Fix |
+| CKV_AWS_129/157/118/226, CKV2_AWS_60 | app_db | Logging, Multi-AZ, monitoring, auto-upgrade, snapshot tags | Low | Fix — ops hardening |
+| CKV_AWS_126/135 | app_server | Detailed monitoring, EBS optimization | Info | Accept — cost/perf, not security |
+
+## Secrets scan
+
+Checkov secrets framework run standalone: 0 findings. The hardcoded RDS
+password in compute.tf was NOT detected — Checkov's console masking of
+password-shaped fields is cosmetic, not a rule match. This is the gap
+gitleaks is added to close in Week 2.
