@@ -18,9 +18,16 @@ resource "aws_iam_role_policy" "app_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = "*"
-      Resource = "*"
+      Effect = "Allow"
+      Action = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ]
+      Resource = [
+        aws_s3_bucket.data_bucket.arn,
+        "${aws_s3_bucket.data_bucket.arn}/*"
+      ]
     }]
   })
 }
@@ -32,7 +39,7 @@ resource "aws_iam_role" "ci_role" {
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
-      Principal = { AWS = "*" }
+      Principal = { AWS = "arn:aws:iam::${var.aws_account_id}:root" }
       Action = "sts:AssumeRole"
     }]
   })
@@ -51,7 +58,7 @@ resource "aws_iam_role_policy" "ci_policy" {
         "iam:AttachRolePolicy",
         "iam:PassRole"
       ]
-      Resource = "*"
+      Resource = "arn:aws:iam::${var.aws_account_id}:role/ci-deploy-target-*"
     }]
   })
 }
