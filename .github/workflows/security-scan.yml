@@ -8,7 +8,7 @@ on:
 
 jobs:
   checkov:
-    name: Checkov
+    name: Checkov (policy gate)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,10 +17,11 @@ jobs:
         with:
           directory: terraform
           quiet: true
-          soft_fail: true
+          soft_fail: false
+          check: CKV_AWS_24,CKV_AWS_25,CKV_AWS_53,CKV_AWS_54,CKV_AWS_55,CKV_AWS_56,CKV2_AWS_6,CKV2_AWS_12,CKV_AWS_79,CKV_AWS_88,CKV_AWS_17,CKV_AWS_16,CKV_AWS_60,CKV_AWS_62,CKV_AWS_63,CKV_AWS_286,CKV_AWS_287,CKV_AWS_288,CKV_AWS_289,CKV_AWS_290,CKV_AWS_355,CKV2_AWS_40
 
   tfsec:
-    name: tfsec
+    name: tfsec (report only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
