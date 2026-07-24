@@ -9,3 +9,9 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "ci_trusted_role_name" {
+  description = "Name of the specific IAM role permitted to assume ci_role (avoids trusting the whole account root)"
+  type        = string
+  default     = "github-actions-deployer"
+}
